@@ -1,0 +1,3028 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discipline Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-card: #21262d;
+            --bg-accent: #0d1117;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --text-tertiary: #6e7681;
+            --accent-win: #2dd4bf;
+            --accent-loss: #ef4444;
+            --accent-holiday: #fb923c;
+            --accent-focus: #fbbf24;
+            --accent-primary: #6366f1;
+            --accent-gold: #fbbf24;
+            --accent-blue: #6366f1;
+            --accent-success: #2dd4bf;
+            --accent-green: #22c55e;
+            --accent-red: #ef4444;
+            --border-dark: rgba(88, 166, 255, 0.12);
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.6);
+            --shadow-md: 0 8px 28px rgba(0, 0, 0, 0.7);
+            --shadow-lg: 0 20px 48px rgba(0, 0, 0, 0.8);
+        }
+
+        body.light-mode {
+            --bg-primary: #f8fafc;
+            --bg-secondary: #f1f5f9;
+            --bg-card: #ffffff;
+            --bg-accent: #f8fafc;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-tertiary: #94a3b8;
+            --accent-win: #14b8a6;
+            --accent-loss: #f43f5e;
+            --accent-holiday: #f97316;
+            --accent-focus: #f59e0b;
+            --accent-primary: #6366f1;
+            --accent-gold: #f59e0b;
+            --accent-blue: #6366f1;
+            --accent-success: #14b8a6;
+            --accent-green: #10b981;
+            --accent-red: #f43f5e;
+            --border-dark: rgba(148, 163, 184, 0.2);
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            color: var(--text-primary);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+            transition: background 0.3s ease, color 0.3s ease;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 48px;
+            padding: 40px 32px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(45, 212, 191, 0.08) 100%);
+            border-radius: 16px;
+            border: 1px solid var(--border-dark);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 24px;
+        }
+
+        .theme-toggle {
+            background: var(--bg-card);
+            border: 1px solid var(--border-dark);
+            color: var(--text-primary);
+            border-radius: 10px;
+            padding: 10px 16px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .theme-toggle:hover {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+            color: var(--bg-card);
+        }
+
+        header h1 {
+            font-size: 44px;
+            font-weight: 900;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--accent-win) 0%, var(--accent-primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -1.5px;
+        }
+
+        .today-date {
+            font-size: 13px;
+            color: var(--text-tertiary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+        }
+
+        /* ========== COLLAPSIBLE ========== */
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            user-select: none;
+            padding: 4px 0;
+        }
+
+        .card-header h2 {
+            flex: 1;
+        }
+
+        .collapse-toggle {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            background: var(--bg-accent);
+            color: var(--accent-focus);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .collapse-toggle:hover {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(99, 102, 241, 0.1));
+            transform: scale(1.15);
+            color: var(--accent-primary);
+        }
+
+        .card-content {
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .card-content.collapsed {
+            max-height: 0;
+            opacity: 0;
+            margin-top: 0;
+            display: none;
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        @media (min-width: 1024px) {
+            .grid-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .main-section {
+            display: grid;
+            gap: 40px;
+        }
+
+        .section-group {
+            display: grid;
+            gap: 20px;
+        }
+
+        .section-group:first-child {
+            grid-column: 1;
+        }
+
+        .section-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .section-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(60, 80, 110, 0.06) 100%);
+            border: 1px solid var(--border-dark);
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+        }
+
+        .card:hover {
+            border-color: var(--accent-gold);
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-6px);
+        }
+
+        .card h2 {
+            font-size: 13px;
+            font-weight: 900;
+            margin-bottom: 24px;
+            color: var(--accent-focus);
+            text-transform: uppercase;
+            letter-spacing: 1.4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card h2::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 18px;
+            background: linear-gradient(180deg, var(--accent-focus) 0%, var(--accent-primary) 100%);
+            border-radius: 2px;
+        }
+
+        .tasks-section {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            background: var(--bg-accent);
+            border: 1px solid var(--border-dark);
+            border-radius: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .task-item:hover {
+            background: linear-gradient(135deg, var(--bg-accent) 0%, rgba(251, 191, 36, 0.05) 100%);
+            border-color: var(--accent-gold);
+            transform: translateX(4px);
+            box-shadow: 0 4px 16px rgba(251, 191, 36, 0.15);
+        }
+
+        .task-item input[type="checkbox"] {
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+            accent-color: #22c55e;
+            transition: transform 0.2s;
+            flex-shrink: 0;
+        }
+
+        .task-item input[type="checkbox"]:hover {
+            transform: scale(1.15);
+        }
+
+        .task-item label {
+            flex: 1;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            user-select: none;
+            font-weight: 550;
+            color: var(--text-secondary);
+        }
+
+        .task-item input[type="checkbox"]:checked + label {
+            color: #22c55e;
+            text-decoration: line-through;
+            opacity: 0.75;
+        }
+
+        .task-badge {
+            font-size: 10px;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 4px;
+            white-space: nowrap;
+            letter-spacing: 0.5px;
+        }
+
+        .task-badge.mand {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            color: #fecaca;
+            box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+        }
+
+        .task-badge.opt {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: #dbeafe;
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .day-status {
+            padding: 18px 20px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(168, 85, 247, 0.08) 100%);
+            border: 2px solid rgba(99, 102, 241, 0.25);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .day-status.win {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.12), rgba(22, 163, 74, 0.08));
+            border-color: rgba(34, 197, 94, 0.4);
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.15);
+        }
+
+        .day-status.loss {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.12), rgba(220, 38, 38, 0.08));
+            border-color: rgba(239, 68, 68, 0.4);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
+        }
+
+        .day-status.holiday {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(217, 119, 6, 0.08));
+            border-color: rgba(245, 158, 11, 0.4);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15);
+        }
+
+        .day-status-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .day-status-icon {
+            font-size: 18px;
+        }
+
+        .day-status.win .day-status-icon {
+            color: #22c55e;
+        }
+
+        .day-status.loss .day-status-icon {
+            color: #ef4444;
+        }
+
+        .day-status-text {
+            font-size: 14px;
+        }
+
+        .day-status.win .day-status-text {
+            color: #86efac;
+        }
+
+        .day-status.loss .day-status-text {
+            color: #fca5a5;
+        }
+
+        .day-status-saved {
+            font-size: 12px;
+            color: #94a3b8;
+            background: rgba(99, 102, 241, 0.2);
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-win) 0%, #06b6d4 100%);
+            color: #0a0e14;
+            box-shadow: 0 6px 20px rgba(45, 212, 191, 0.35);
+            font-weight: 700;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(45, 212, 191, 0.5);
+            background: linear-gradient(135deg, #22d3ee 0%, var(--accent-win) 100%);
+        }
+
+        .btn-primary:active {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(45, 212, 191, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-accent) 100%);
+            color: var(--text-secondary);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            font-weight: 600;
+            border: 1px solid var(--border-dark);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            background: linear-gradient(135deg, var(--bg-accent) 0%, var(--bg-card) 100%);
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        .btn-secondary:active {
+            transform: translateY(-1px);
+        }
+
+        #holidayBtn.active {
+            background: linear-gradient(135deg, var(--accent-holiday) 0%, #f97316 100%);
+            color: #0a0e14;
+            box-shadow: 0 6px 20px rgba(251, 146, 60, 0.4);
+        }
+
+        #holidayBtn.active:hover {
+            background: linear-gradient(135deg, #fdba74 0%, var(--accent-holiday) 100%);
+            box-shadow: 0 10px 28px rgba(251, 146, 60, 0.5);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--accent-loss), #ec4899);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(244, 114, 182, 0.3);
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(244, 114, 182, 0.4);
+        }
+
+        .btn-danger:active {
+            transform: translateY(0);
+        }
+
+        .btn-win {
+            background: linear-gradient(135deg, var(--accent-green), #10b981);
+            color: #0a0e14;
+            flex: 1;
+            min-width: 120px;
+            box-shadow: 0 6px 16px rgba(52, 211, 153, 0.35);
+        }
+
+        .btn-loss {
+            background: linear-gradient(135deg, var(--accent-red), #f87171);
+            color: #0a0e14;
+            flex: 1;
+            min-width: 120px;
+            box-shadow: 0 6px 16px rgba(248, 113, 113, 0.35);
+        }
+
+        .btn-win:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 28px rgba(52, 211, 153, 0.45);
+        }
+
+        .btn-loss:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+        }
+
+        .btn-win:active,
+        .btn-loss:active {
+            transform: translateY(0);
+        }
+
+        .sidebar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            width: 100%;
+            order: 10;
+        }
+
+        .sidebar-group {
+            display: contents;
+        }
+
+        .sidebar-title {
+            display: none;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(168, 85, 247, 0.1) 100%);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 14px;
+            padding: 28px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent-primary);
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(168, 85, 247, 0.15) 100%);
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.2);
+        }
+
+        .stat-box {
+            background: transparent;
+            border-radius: 0;
+            padding: 0;
+            text-align: center;
+            transition: none;
+        }
+
+        .stat-box:hover {
+            transform: none;
+            border-color: transparent;
+        }
+
+        .stat-box .stat-value {
+            font-size: 44px;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent-success), var(--accent-primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: none;
+            margin-bottom: 8px;
+        }
+
+        .stat-box .stat-label {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.9px;
+        }
+
+        /* ========== NEW FEATURES STYLES ========== */
+        .habit-intensity, .daily-notes, .task-adjustments, .weekly-goal {
+            margin-top: 16px;
+            padding: 14px;
+            background: rgba(99, 102, 241, 0.05);
+            border: 1px solid var(--border-light);
+            border-radius: 10px;
+        }
+
+        .intensity-stars {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .star-btn {
+            width: 40px;
+            height: 40px;
+            border: 2px solid rgba(99, 102, 241, 0.3);
+            background: transparent;
+            border-radius: 8px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .star-btn:hover {
+            border-color: var(--accent-primary);
+            transform: scale(1.1);
+        }
+
+        .star-btn.active {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .daily-notes textarea, .task-adjustments textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 10px;
+            border: 1px solid var(--border-light);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 13px;
+            margin-top: 8px;
+            resize: vertical;
+        }
+
+        .goal-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .goal-input-group input {
+            padding: 10px;
+            border: 1px solid var(--border-light);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border-radius: 8px;
+            font-size: 13px;
+        }
+
+        .weekly-progress {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+
+        .weekly-progress-day {
+            width: 100%;
+            height: auto;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 8px 4px;
+            min-width: 35px;
+        }
+
+        .weekly-progress-day.win {
+            background: #22c55e;
+            color: white;
+        }
+
+        .weekly-progress-day.loss {
+            background: #ef4444;
+            color: white;
+        }
+
+        .weekly-progress-day.empty {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--text-tertiary);
+        }
+
+        .streak-history {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .streak-item {
+            padding: 12px;
+            background: rgba(99, 102, 241, 0.08);
+            border-left: 4px solid var(--accent-primary);
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .streak-item.active {
+            border-left-color: #22c55e;
+            background: rgba(34, 197, 94, 0.08);
+        }
+
+        .streak-dates {
+            color: var(--text-tertiary);
+            font-size: 11px;
+            margin-top: 6px;
+        }
+
+        .leaderboard-content {
+            font-size: 13px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            animation: fadeIn 0.3s;
+            backdrop-filter: blur(6px);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a1f3a 0%, #16213e 100%);
+            margin: 8% auto;
+            padding: 32px;
+            border: 1.5px solid rgba(99, 102, 241, 0.4);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 24px 72px rgba(0, 0, 0, 0.6);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(24px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            border-bottom: 2px solid rgba(99, 102, 241, 0.35);
+            padding-bottom: 18px;
+        }
+
+        .modal-header h2 {
+            font-size: 20px;
+            font-weight: 800;
+            color: #e2e8f0;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 28px;
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            border-radius: 8px;
+        }
+
+        .close-btn:hover {
+            color: #e2e8f0;
+            background-color: rgba(99, 102, 241, 0.25);
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 220px;
+            padding: 16px;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a3e 100%);
+            color: #e2e8f0;
+            border: 1.5px solid rgba(99, 102, 241, 0.3);
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            resize: vertical;
+            transition: all 0.3s;
+            line-height: 1.6;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: rgba(99, 102, 241, 0.7);
+            box-shadow: 0 0 16px rgba(99, 102, 241, 0.25);
+        }
+
+        .task-format-help {
+            font-size: 12px;
+            color: #cbd5e1;
+            margin-top: 16px;
+            padding: 14px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(168, 85, 247, 0.04) 100%);
+            border: 1.5px solid rgba(99, 102, 241, 0.2);
+            border-radius: 8px;
+            font-weight: 500;
+            line-height: 1.6;
+        }
+
+        .week-summary {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .week-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .week-day:hover {
+            transform: scale(1.12);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+        }
+
+        .week-day.win {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: #020617;
+            box-shadow: 0 4px 14px rgba(34, 197, 94, 0.4);
+        }
+
+        .week-day.loss {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: #fecaca;
+            box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4);
+        }
+
+        .week-day.empty {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(168, 85, 247, 0.04));
+            color: #64748b;
+            border-color: rgba(99, 102, 241, 0.15);
+        }
+
+        .calendar {
+            margin-top: 12px;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 12px;
+        }
+
+        .calendar-nav button {
+            padding: 8px 12px;
+            font-size: 13px;
+        }
+
+        .calendar-month-year {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--accent-focus);
+        }
+
+        .calendar-filters {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 14px;
+            border: 1px solid var(--border-dark);
+            background: var(--bg-accent);
+            color: var(--text-secondary);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        .filter-btn.active {
+            background: var(--accent-primary);
+            color: #ffffff;
+            border-color: var(--accent-primary);
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            border: 1px solid rgba(99, 102, 241, 0.15);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: var(--bg-accent);
+            color: var(--text-secondary);
+        }
+
+        .calendar-day:hover {
+            border-color: var(--accent-primary);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(99, 102, 241, 0.2);
+        }
+
+        .calendar-day.other-month {
+            color: var(--text-tertiary);
+            opacity: 0.3;
+        }
+
+        .calendar-day.today {
+            border: 2px solid var(--accent-focus);
+            box-shadow: 0 0 16px rgba(251, 191, 36, 0.4);
+        }
+
+        .calendar-day.win {
+            background: linear-gradient(135deg, var(--accent-win) 0%, #06b6d4 100%);
+            color: #0a0e14;
+            font-weight: 800;
+            border-color: var(--accent-win);
+            box-shadow: 0 6px 18px rgba(45, 212, 191, 0.45);
+        }
+
+        .calendar-day.loss {
+            background: linear-gradient(135deg, var(--accent-loss) 0%, #dc2626 100%);
+            color: #ffffff;
+            font-weight: 800;
+            border-color: var(--accent-loss);
+            box-shadow: 0 6px 18px rgba(239, 68, 68, 0.45);
+        }
+
+        .calendar-day.holiday {
+            background: linear-gradient(135deg, var(--accent-holiday) 0%, #f97316 100%);
+            color: #0a0e14;
+            font-weight: 800;
+            border-color: var(--accent-holiday);
+            box-shadow: 0 6px 18px rgba(251, 146, 60, 0.45);
+        }
+
+        .calendar-weekday {
+            text-align: center;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--accent-focus);
+            padding: 14px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+        }
+
+        .task-scorecard {
+            margin-top: 14px;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid var(--border-dark);
+        }
+
+        .scorecard-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 16px;
+            background: var(--bg-accent);
+            border-bottom: 1px solid var(--border-dark);
+            font-size: 13px;
+            transition: all 0.3s ease;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .scorecard-row:hover {
+            background: linear-gradient(90deg, rgba(251, 191, 36, 0.05) 0%, transparent 100%);
+            padding-left: 20px;
+            border-left: 3px solid var(--accent-gold);
+        }
+
+        .scorecard-row:last-child {
+            border-bottom: none;
+        }
+
+        .scorecard-task-name {
+            flex: 1;
+            font-weight: 600;
+            min-width: 150px;
+            color: var(--text-primary);
+        }
+
+        .scorecard-count {
+            display: flex;
+            gap: 14px;
+            align-items: center;
+        }
+
+        .scorecard-count-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.08) 0%, rgba(99, 102, 241, 0.04) 100%);
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            transition: all 0.2s ease;
+        }
+
+        .scorecard-count-item:hover {
+            border-color: rgba(34, 197, 94, 0.35);
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.12) 0%, rgba(99, 102, 241, 0.06) 100%);
+        }
+
+        .scorecard-count-label {
+            font-size: 10px;
+            color: var(--text-tertiary);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-bottom: 3px;
+
+        }
+
+        .scorecard-count-value {
+            font-weight: 800;
+            color: #22c55e;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .grid-layout {
+                grid-template-columns: 1fr;
+            }
+
+            header h1 {
+                font-size: 28px;
+            }
+
+            .modal-content {
+                margin: 25% auto;
+                width: 95%;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn-win,
+            .btn-loss {
+                min-width: unset;
+                width: 100%;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .week-summary {
+                gap: 6px;
+            }
+
+            .calendar-day {
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 12px;
+            }
+
+            header h1 {
+                font-size: 24px;
+            }
+
+            .card {
+                padding: 16px;
+            }
+
+            .modal-content {
+                margin: 40% auto;
+                padding: 20px;
+                width: 98%;
+            }
+
+            button {
+                padding: 10px 16px;
+                font-size: 13px;
+            }
+
+            .stat-box .stat-value {
+                font-size: 28px;
+            }
+        }
+
+        .status-message {
+            padding: 14px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            animation: fadeInOut 2s ease-in-out forwards;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+
+        @keyframes fadeInOut {
+            0% {
+                opacity: 0;
+                transform: translateY(-12px);
+            }
+            10% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            90% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-12px);
+            }
+        }
+
+        .status-success {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(22, 163, 74, 0.1));
+            color: #86efac;
+        }
+
+        .achievement-badge {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            padding: 14px 12px;
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(168, 85, 247, 0.08) 100%);
+            border: 1.5px solid rgba(251, 191, 36, 0.35);
+            border-radius: 12px;
+            text-align: center;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .achievement-badge:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 16px rgba(251, 191, 36, 0.2);
+            border-color: rgba(251, 191, 36, 0.5);
+        }
+
+        .achievement-badge.locked {
+            opacity: 0.45;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.06) 0%, rgba(168, 85, 247, 0.03) 100%);
+            border-color: rgba(99, 102, 241, 0.25);
+        }
+
+        .achievement-badge.locked:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .achievement-icon {
+            font-size: 28px;
+        }
+
+        .achievements-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            gap: 14px;
+            margin-top: 14px;
+        }
+
+        .settings-grid {
+            display: grid;
+            gap: 20px;
+            margin-top: 16px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(168, 85, 247, 0.02) 100%);
+            border: 1px solid rgba(99, 102, 241, 0.15);
+            border-radius: 12px;
+        }
+
+        .setting-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .setting-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .setting-value {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        input[type="range"] {
+            flex: 1;
+            cursor: pointer;
+            height: 6px;
+            background: linear-gradient(90deg, rgba(34, 197, 94, 0.3), rgba(99, 102, 241, 0.3));
+            border-radius: 3px;
+            outline: none;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+            transition: all 0.2s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.5);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+            transition: all 0.2s;
+        }
+
+        input[type="range"]::-moz-range-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.5);
+        }
+
+        .setting-display {
+            font-size: 16px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-success), var(--accent-primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            min-width: 45px;
+            text-align: right;
+            display: inline-block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-top: 14px;
+            min-height: 100px;
+        }
+
+        .analytics-item {
+            background: linear-gradient(135deg, var(--bg-accent) 0%, rgba(251, 191, 36, 0.03) 100%);
+            border: 1px solid var(--border-dark);
+            border-radius: 12px;
+            padding: 18px;
+            text-align: center;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .analytics-item:hover {
+            transform: translateY(-6px);
+            border-color: var(--accent-gold);
+            box-shadow: 0 8px 24px rgba(251, 191, 36, 0.2);
+        }
+
+        .analytics-item-value {
+            font-size: 32px;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent-gold), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 6px;
+        }
+
+        .analytics-item-label {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+        }
+
+        .monthly-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            gap: 12px;
+            margin-top: 14px;
+        }
+
+        .month-item {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(168, 85, 247, 0.04) 100%);
+            border: 1.5px solid rgba(99, 102, 241, 0.2);
+            border-radius: 10px;
+            padding: 14px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .month-item:hover {
+            transform: translateY(-4px);
+            border-color: rgba(99, 102, 241, 0.35);
+            box-shadow: 0 6px 16px rgba(99, 102, 241, 0.15);
+        }
+
+        .month-name {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            font-weight: 700;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .month-stats {
+            display: flex;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 800;
+            justify-content: center;
+        }
+
+        .month-win {
+            color: #22c55e;
+        }
+
+        .month-loss {
+            color: #ef4444;
+        }
+
+        .export-btn {
+            display: inline-flex;
+            gap: 8px;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-top">
+                <div></div>
+                <button class="theme-toggle" id="themeToggle">🌙 Dark</button>
+            </div>
+            <h1>Discipline</h1>
+            <div class="today-date" id="todayDate"></div>
+        </header>
+
+        <div id="statusMessage" class="status-message" style="display: none;"></div>
+
+        <div class="grid-layout">
+            <div class="main-section">
+                <!-- PRIMARY SECTION: TODAY'S FOCUS -->
+                <div class="section-group">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Today's Tasks</h2>
+                            <button class="collapse-toggle" data-card="todays-tasks">−</button>
+                        </div>
+                        <div class="card-content">
+                            <div class="day-status" id="dayStatus">
+                            <div class="day-status-label">
+                                <span class="day-status-icon">—</span>
+                                <span class="day-status-text">Not yet evaluated</span>
+                            </div>
+                            <span class="day-status-saved" id="savedIndicator"></span>
+                        </div>
+                        <div class="tasks-section" id="tasksList"></div>
+
+                        <!-- Habit Intensity Rating -->
+                        <div class="habit-intensity">
+                            <label class="setting-label">Difficulty Level</label>
+                            <div class="intensity-stars" id="intensityStars">
+                                <button class="star-btn" data-intensity="1">🟢</button>
+                                <button class="star-btn" data-intensity="2">🟡</button>
+                                <button class="star-btn" data-intensity="3">🟠</button>
+                                <button class="star-btn" data-intensity="4">🔴</button>
+                                <button class="star-btn" data-intensity="5">⚫</button>
+                            </div>
+                        </div>
+
+                        <!-- Daily Notes/Reflection -->
+                        <div class="daily-notes">
+                            <label class="setting-label">Daily Notes</label>
+                            <textarea id="dailyNotes" placeholder="How did today go? What went well? What to improve?"></textarea>
+                        </div>
+
+                        <!-- Task Swap/Adjustments -->
+                        <div class="task-adjustments">
+                            <label class="setting-label">Task Adjustments</label>
+                            <textarea id="taskAdjustments" placeholder="e.g., Replaced 'Workout' with 'Long Walk'"></textarea>
+                        </div>
+
+                        <!-- Weekly Goal -->
+                        <div class="weekly-goal">
+                            <label class="setting-label">This Week's Goal</label>
+                            <div class="goal-input-group">
+                                <input type="number" id="weeklyGoal" min="0" max="7" placeholder="Target wins for this week">
+                                <div class="weekly-progress" id="weeklyProgress"></div>
+                            </div>
+                        </div>
+
+                        <div class="button-group">
+                            <button class="btn-primary" id="saveDayBtn">💾 Save Day</button>
+                            <button class="btn-secondary" id="editTasksBtn">✏️ Edit Tasks</button>
+                            <button class="btn-secondary" id="holidayBtn" title="Mark as holiday/break day">🏖️ Holiday</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CALENDAR SECTION (After Tasks) -->
+                <div class="section-group">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Calendar</h2>
+                            <button class="collapse-toggle" data-card="calendar">−</button>
+                        </div>
+                        <div class="card-content">
+                            <div class="calendar">
+                                <div class="calendar-header">
+                                    <button class="btn-secondary" id="prevMonthBtn">← Prev</button>
+                                    <span class="calendar-month-year" id="monthYear"></span>
+                                    <button class="btn-secondary" id="nextMonthBtn">Next →</button>
+                                </div>
+                                <div class="calendar-filters">
+                                    <button class="filter-btn active" data-filter="all" id="filterAll">All Days</button>
+                                    <button class="filter-btn" data-filter="win" id="filterWin">✓ Wins</button>
+                                    <button class="filter-btn" data-filter="loss" id="filterLoss">✗ Losses</button>
+                                    <button class="filter-btn" data-filter="holiday" id="filterHoliday">🏖️ Holidays</button>
+                                </div>
+                                <div class="calendar-grid" id="calendarGrid"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- QUICK STATS SECTION -->
+                <div class="sidebar">
+                    <div class="sidebar-group">
+                        <div class="stat-card">
+                            <div class="stat-box">
+                                <div class="stat-value" id="statWins">0</div>
+                                <div class="stat-label">Total Wins</div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-box">
+                                <div class="stat-value" id="statCurrentStreak">0</div>
+                                <div class="stat-label">Current Streak</div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-box">
+                                <div class="stat-value" id="statBestStreak">0</div>
+                                <div class="stat-label">Best Streak</div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-box">
+                                <div class="stat-value" id="statPerfectWeeks">0</div>
+                                <div class="stat-label">Perfect Weeks</div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-box">
+                                <div class="stat-value" id="statLosses">0</div>
+                                <div class="stat-label">Total Losses</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ANALYTICS & TASK SCORECARD -->
+                <div class="section-group">
+                    <div class="section-cards">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Analytics</h2>
+                                <button class="collapse-toggle" data-card="analytics">−</button>
+                            </div>
+                            <div class="card-content" style="display: block !important; visibility: visible !important; opacity: 1 !important;">
+                                <div class="analytics-grid" id="analyticsGrid" style="display: grid !important; visibility: visible !important; opacity: 1 !important;">
+                                    <div class="analytics-item" style="display: flex !important; visibility: visible !important;">
+                                        <div class="analytics-item-value" style="color: #6366f1 !important; font-size: 32px !important; font-weight: bold !important;">0</div>
+                                        <div class="analytics-item-label">Total Days</div>
+                                    </div>
+                                    <div class="analytics-item" style="display: flex !important; visibility: visible !important;">
+                                        <div class="analytics-item-value" style="color: #6366f1 !important; font-size: 32px !important; font-weight: bold !important;">0%</div>
+                                        <div class="analytics-item-label">Win Rate</div>
+                                    </div>
+                                    <div class="analytics-item" style="display: flex !important; visibility: visible !important;">
+                                        <div class="analytics-item-value" style="color: #6366f1 !important; font-size: 32px !important; font-weight: bold !important;">0</div>
+                                        <div class="analytics-item-label">Losses</div>
+                                    </div>
+                                    <div class="analytics-item" style="display: flex !important; visibility: visible !important;">
+                                        <div class="analytics-item-value" style="color: #6366f1 !important; font-size: 32px !important; font-weight: bold !important;">0</div>
+                                        <div class="analytics-item-label">Avg/Week</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Task Scorecard</h2>
+                                <button class="collapse-toggle" data-card="task-scorecard">−</button>
+                            </div>
+                            <div class="card-content">
+                                <div class="task-scorecard" id="taskScorecard"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ACHIEVEMENTS & MONTHLY SUMMARY -->
+                <div class="section-group">
+                    <div class="section-cards">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Achievements</h2>
+                                <button class="collapse-toggle" data-card="achievements">−</button>
+                            </div>
+                            <div class="card-content">
+                                <div class="achievements-container" id="achievementsContainer"></div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Monthly Summary</h2>
+                                <button class="collapse-toggle" data-card="monthly-summary">−</button>
+                            </div>
+                            <div class="card-content">
+                                <div class="monthly-grid" id="monthlyGrid"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SHARE STATS SECTION -->
+                <div class="section-group">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Share Stats</h2>
+                            <button class="collapse-toggle" data-card="leaderboard">−</button>
+                        </div>
+                        <div class="card-content">
+                            <div class="leaderboard-content">
+                                <div class="setting-item" style="margin-bottom: 14px;">
+                                    <label class="setting-label">Select Month</label>
+                                    <select id="shareMonthSelector" style="width: 100%; padding: 10px; border-radius: 8px; background: var(--bg-accent); color: var(--text-primary); border: 1px solid var(--border-dark); font-size: 13px; cursor: pointer;">
+                                        <option value="all">All Time</option>
+                                    </select>
+                                </div>
+                                <button class="btn-secondary" id="shareStatsBtn" style="width: 100%; margin-bottom: 12px;">📋 Copy Stats to Share</button>
+                                <div id="shareStatsPreview" style="display: none; background: rgba(99, 102, 241, 0.1); padding: 12px; border-radius: 8px; font-size: 12px; word-break: break-word;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- QUINARY SECTION: SETTINGS -->
+                <div class="section-group">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Settings & Data</h2>
+                            <button class="collapse-toggle" data-card="settings">−</button>
+                        </div>
+                        <div class="card-content">
+                            <div class="settings-grid">
+                                <div class="setting-item">
+                                    <label class="setting-label">Optional Tasks Threshold</label>
+                                    <div class="setting-value">
+                                        <input type="range" id="thresholdSlider" min="50" max="100" step="5" value="80" oninput="document.getElementById('thresholdDisplay').textContent = this.value + '%'">
+                                        <span class="setting-display" id="thresholdDisplay" style="display: inline-block !important; visibility: visible !important; opacity: 1 !important; color: #6366f1 !important; font-size: 18px !important; font-weight: bold !important;">80%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="button-group" style="margin-top: 16px;">
+                                <button class="btn-secondary" id="exportDataBtn">💾 Export Data</button>
+                                <button class="btn-secondary" id="importDataBtn">📂 Import Data</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Tasks Modal -->
+    <div id="editTasksModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Tasks</h2>
+                <button class="close-btn" id="closeEditModal">&times;</button>
+            </div>
+            <textarea id="tasksTextarea" placeholder="One task per line. Prefix with ! for mandatory tasks."></textarea>
+            <div class="task-format-help">
+                <strong>Format:</strong><br>
+                !Task name (mandatory)<br>
+                Task name (optional)
+            </div>
+            <div class="button-group" style="margin-top: 16px;">
+                <button class="btn-primary" id="saveTasksBtn">Save Tasks</button>
+                <button class="btn-secondary" id="cancelEditBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Data Modal -->
+    <div id="importModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Import Data</h2>
+                <button class="close-btn" id="closeImportModal">&times;</button>
+            </div>
+            <textarea id="importTextarea" placeholder="Paste your exported JSON data here..."></textarea>
+            <div class="task-format-help">
+                Paste the exported data from another device or backup.
+            </div>
+            <div class="button-group" style="margin-top: 16px;">
+                <button class="btn-primary" id="confirmImportBtn">Import Data</button>
+                <button class="btn-secondary" id="cancelImportBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============ INITIALIZATION ============
+
+        class DisciplineTracker {
+            constructor() {
+                this.tracker = this.loadTracker();
+                this.taskList = this.loadTaskList();
+                this.currentDate = new Date();
+                this.calendarDate = new Date();
+                this.theme = this.loadTheme();
+                this.threshold = this.loadThreshold();
+                this.calendarFilter = 'all';
+
+                this.init();
+                this.applyTheme();
+                this.render();
+                this.setupEventListeners();
+                this.updateThresholdDisplay();
+            }
+
+            init() {
+                // Initialize default tasks if none exist
+                if (this.taskList.length === 0) {
+                    this.taskList = [
+                        "!Pray 5 Namaz",
+                        "!Quran",
+                        "Box / Workout",
+                        "Book Reading",
+                        "Deep Work"
+                    ];
+                    this.saveTaskList();
+                }
+            }
+
+            // ============ SETTINGS ============
+
+            loadThreshold() {
+                return parseInt(localStorage.getItem('threshold') || '80');
+            }
+
+            saveThreshold(val) {
+                this.threshold = val;
+                localStorage.setItem('threshold', val.toString());
+            }
+
+            // ============ DATA PERSISTENCE ============
+
+            loadTracker() {
+                const data = localStorage.getItem('tracker');
+                return data ? JSON.parse(data) : {};
+            }
+
+            saveTracker() {
+                localStorage.setItem('tracker', JSON.stringify(this.tracker));
+            }
+
+            loadTaskList() {
+                const data = localStorage.getItem('task_list');
+                return data ? JSON.parse(data) : [];
+            }
+
+            saveTaskList() {
+                localStorage.setItem('task_list', JSON.stringify(this.taskList));
+            }
+
+            loadTheme() {
+                return localStorage.getItem('theme') || 'dark';
+            }
+
+            saveTheme() {
+                localStorage.setItem('theme', this.theme);
+            }
+
+            applyTheme() {
+                if (this.theme === 'light') {
+                    document.body.classList.add('light-mode');
+                } else {
+                    document.body.classList.remove('light-mode');
+                }
+            }
+
+            toggleTheme() {
+                this.theme = this.theme === 'dark' ? 'light' : 'dark';
+                this.saveTheme();
+                this.applyTheme();
+                this.updateThemeButton();
+            }
+
+            updateThemeButton() {
+                const btn = document.getElementById('themeToggle');
+                if (btn) {
+                    btn.textContent = this.theme === 'dark' ? '☀️ Light' : '🌙 Dark';
+                }
+            }
+
+            // ============ DATE UTILITIES ============
+
+            getTodayISO() {
+                return this.formatISO(this.currentDate);
+            }
+
+            formatISO(date) {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
+
+            formatDateDisplay(date) {
+                const options = { day: '2-digit', month: 'short', year: 'numeric' };
+                return date.toLocaleDateString('en-US', options);
+            }
+
+            // ============ TASK PARSING ============
+
+            parseTask(taskStr) {
+                const mandatory = taskStr.startsWith('!');
+                const name = mandatory ? taskStr.slice(1).trim() : taskStr.trim();
+                return { name, mandatory };
+            }
+
+            // ============ DAY DATA ============
+
+            getTodayData() {
+                const iso = this.getTodayISO();
+                if (!this.tracker[iso]) {
+                    // Initialize with all tasks checked by default
+                    this.tracker[iso] = {
+                        result: null,
+                        tasks: Array(this.taskList.length).fill(true)
+                    };
+                    this.saveTracker();
+                }
+                return this.tracker[iso];
+            }
+
+            setDayData(iso, result) {
+                if (!this.tracker[iso]) {
+                    this.tracker[iso] = {
+                        result: result,
+                        tasks: Array(this.taskList.length).fill(true)
+                    };
+                } else {
+                    this.tracker[iso].result = result;
+                }
+                this.saveTracker();
+                this.showStatus(`Day saved as ${result === 'W' ? 'WIN' : 'LOSS'}`, 'success');
+            }
+
+            updateDayTasks(iso, tasks) {
+                if (!this.tracker[iso]) {
+                    this.tracker[iso] = {
+                        result: null,
+                        tasks: tasks
+                    };
+                } else {
+                    this.tracker[iso].tasks = tasks;
+                }
+                this.saveTracker();
+            }
+
+            // ============ WIN/LOSS LOGIC ============
+
+            calculateResult(tasks) {
+                if (this.taskList.length === 0) return null;
+
+                const mandatoryTasks = this.taskList.map((t, i) => ({
+                    mandatory: this.parseTask(t).mandatory,
+                    index: i
+                })).filter(t => t.mandatory);
+
+                const optionalTasks = this.taskList.map((t, i) => ({
+                    mandatory: this.parseTask(t).mandatory,
+                    index: i
+                })).filter(t => !t.mandatory);
+
+                // Check mandatory tasks
+                for (let task of mandatoryTasks) {
+                    if (!tasks[task.index]) {
+                        return 'L';
+                    }
+                }
+
+                // Check optional tasks (80% rule)
+                if (optionalTasks.length > 0) {
+                    const completedOptional = optionalTasks.filter(t => tasks[t.index]).length;
+                    const requiredOptional = Math.ceil(optionalTasks.length * (this.threshold / 100));
+                    if (completedOptional < requiredOptional) {
+                        return 'L';
+                    }
+                }
+
+                return 'W';
+            }
+
+            // ============ STATS CALCULATION ============
+
+            calculateStats() {
+                let wins = 0;
+                let losses = 0;
+
+                const sortedDates = Object.keys(this.tracker).sort();
+
+                for (let iso of sortedDates) {
+                    // Completely ignore holidays in stats
+                    if (this.tracker[iso].isHoliday) {
+                        continue;
+                    }
+                    
+                    const result = this.tracker[iso].result;
+                    if (result === 'W') {
+                        wins++;
+                    } else if (result === 'L') {
+                        losses++;
+                    }
+                }
+
+                // Use new streak calculation
+                const streaks = this.calculateStreaks();
+                const currentStreak = streaks.currentStreak;
+                const bestStreak = streaks.bestStreak;
+
+                return { wins, losses, currentStreak, bestStreak };
+            }
+
+            getTaskScorecard() {
+                const scorecard = this.taskList.map((taskStr, idx) => {
+                    let completedCount = 0;
+                    const totalDays = Object.keys(this.tracker).filter(iso => {
+                        const day = this.tracker[iso];
+                        return day && day.result !== null && !day.isHoliday;
+                    }).length;
+
+                    for (let iso in this.tracker) {
+                        const day = this.tracker[iso];
+                        if (day && day.result !== null && !day.isHoliday && day.tasks && day.tasks[idx]) {
+                            completedCount++;
+                        }
+                    }
+
+                    return {
+                        name: this.parseTask(taskStr).name,
+                        completed: completedCount,
+                        total: totalDays
+                    };
+                });
+
+                return scorecard;
+            }
+
+            // ============ RENDERING ============
+
+            render() {
+                this.renderHeader();
+                this.renderTasks();
+                this.updateHolidayButton();
+                this.renderStats();
+                this.renderWeeklyProgress();
+                this.renderCalendar();
+                this.renderTaskScorecard();
+                this.renderAnalytics();
+                this.renderAchievements();
+                this.renderMonthlySummary();
+                this.populateMonthSelector();
+                this.updateThresholdDisplay();
+            }
+
+            renderHeader() {
+                document.getElementById('todayDate').textContent = this.formatDateDisplay(this.currentDate);
+            }
+
+            renderTasks() {
+                const todayData = this.getTodayData();
+                const tasksList = document.getElementById('tasksList');
+                tasksList.innerHTML = '';
+
+                this.taskList.forEach((taskStr, idx) => {
+                    const { name, mandatory } = this.parseTask(taskStr);
+                    const isCompleted = todayData.tasks[idx];
+
+                    const taskItem = document.createElement('div');
+                    taskItem.className = 'task-item';
+
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.id = `task-${idx}`;
+                    checkbox.checked = isCompleted;
+                    checkbox.addEventListener('change', (e) => {
+                        todayData.tasks[idx] = e.target.checked;
+                        this.updateDayTasks(this.getTodayISO(), todayData.tasks);
+                        this.updateDayStatus();
+                    });
+
+                    const label = document.createElement('label');
+                    label.htmlFor = `task-${idx}`;
+                    label.innerHTML = `
+                        ${name}
+                        <span class="task-badge ${mandatory ? 'mand' : 'opt'}">
+                            ${mandatory ? 'MAND' : 'OPT'}
+                        </span>
+                    `;
+
+                    taskItem.appendChild(checkbox);
+                    taskItem.appendChild(label);
+                    tasksList.appendChild(taskItem);
+                });
+
+                this.updateDayStatus();
+            }
+
+            renderStats() {
+                const stats = this.calculateStats();
+                const perfectWeeks = this.countPerfectWeeks();
+                document.getElementById('statWins').textContent = stats.wins;
+                document.getElementById('statLosses').textContent = stats.losses;
+                document.getElementById('statCurrentStreak').textContent = stats.currentStreak;
+                document.getElementById('statBestStreak').textContent = stats.bestStreak;
+                document.getElementById('statPerfectWeeks').textContent = perfectWeeks;
+            }
+
+            renderCalendar() {
+                const year = this.calendarDate.getFullYear();
+                const month = this.calendarDate.getMonth();
+
+                const firstDay = new Date(year, month, 1).getDay();
+                const lastDay = new Date(year, month + 1, 0);
+                const daysInMonth = lastDay.getDate();
+                const startingDayOfWeek = firstDay;
+
+                document.getElementById('monthYear').textContent = this.calendarDate.toLocaleDateString('en-US', {
+                    month: 'long',
+                    year: 'numeric'
+                });
+
+                const calendarGrid = document.getElementById('calendarGrid');
+                calendarGrid.innerHTML = '';
+
+                // Weekday headers
+                const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                weekdays.forEach(day => {
+                    const header = document.createElement('div');
+                    header.className = 'calendar-weekday';
+                    header.textContent = day;
+                    calendarGrid.appendChild(header);
+                });
+
+                // Previous month days
+                for (let i = startingDayOfWeek - 1; i >= 0; i--) {
+                    const date = new Date(year, month, -i);
+                    const day = document.createElement('div');
+                    day.className = 'calendar-day other-month';
+                    day.textContent = date.getDate();
+                    calendarGrid.appendChild(day);
+                }
+
+                // Current month days
+                for (let date = 1; date <= daysInMonth; date++) {
+                    const fullDate = new Date(year, month, date);
+                    const iso = this.formatISO(fullDate);
+                    const dayData = this.tracker[iso];
+
+                    // Check day type
+                    let dayType = null;
+                    if (dayData && dayData.isHoliday) {
+                        dayType = 'holiday';
+                    } else if (dayData && dayData.result) {
+                        dayType = dayData.result === 'W' ? 'win' : 'loss';
+                    }
+
+                    const day = document.createElement('div');
+                    day.className = 'calendar-day';
+
+                    if (this.formatISO(new Date()) === iso) {
+                        day.classList.add('today');
+                    }
+
+                    // Only add color class if filter matches or filter is 'all'
+                    if (dayType && (this.calendarFilter === 'all' || dayType === this.calendarFilter)) {
+                        day.classList.add(dayType);
+                    }
+
+                    day.textContent = date;
+
+                    day.addEventListener('click', () => {
+                        this.loadDay(iso);
+                        this.render();
+                    });
+
+                    calendarGrid.appendChild(day);
+                }
+
+                // Next month days
+                const totalCells = calendarGrid.children.length - 7; // Subtract weekday headers
+                const remainingCells = 42 - totalCells; // 6 rows * 7 days
+                for (let i = 1; i <= remainingCells; i++) {
+                    const date = new Date(year, month + 1, i);
+                    const day = document.createElement('div');
+                    day.className = 'calendar-day other-month';
+                    day.textContent = i;
+                    calendarGrid.appendChild(day);
+                }
+            }
+
+            renderTaskScorecard() {
+                const scorecard = this.getTaskScorecard();
+                const scorecardEl = document.getElementById('taskScorecard');
+                scorecardEl.innerHTML = '';
+
+                if (scorecard.length === 0) {
+                    scorecardEl.innerHTML = '<p style="color: var(--text-tertiary); font-size: 13px;">No tracked days yet.</p>';
+                    return;
+                }
+
+                scorecard.forEach(task => {
+                    const row = document.createElement('div');
+                    row.className = 'scorecard-row';
+                    const percentage = task.total > 0 ? Math.round((task.completed / task.total) * 100) : 0;
+                    row.innerHTML = `
+                        <span class="scorecard-task-name">${task.name}</span>
+                        <div class="scorecard-count">
+                            <div class="scorecard-count-item">
+                                <span class="scorecard-count-label">Completed</span>
+                                <span class="scorecard-count-value">${task.completed}</span>
+                            </div>
+                            <div style="color: var(--text-tertiary); font-weight: 700;">/</div>
+                            <div class="scorecard-count-item">
+                                <span class="scorecard-count-label">Total</span>
+                                <span class="scorecard-count-value">${task.total}</span>
+                            </div>
+                            <div class="scorecard-count-item">
+                                <span class="scorecard-count-label">%</span>
+                                <span class="scorecard-count-value">${percentage}%</span>
+                            </div>
+                        </div>
+                    `;
+                    scorecardEl.appendChild(row);
+                });
+            }
+
+            renderAnalytics() {
+                const stats = this.calculateStats();
+                const totalDays = Object.keys(this.tracker).filter(iso => {
+                    const day = this.tracker[iso];
+                    return day && day.result !== null && !day.isHoliday;
+                }).length;
+                const holidayCount = Object.keys(this.tracker).filter(iso => {
+                    const day = this.tracker[iso];
+                    return day && day.isHoliday;
+                }).length;
+                const winRate = totalDays > 0 ? Math.round((stats.wins / totalDays) * 100) : 0;
+                const avgPerWeek = totalDays > 0 ? Math.round(stats.wins / (totalDays / 7)) : 0;
+                
+                const analyticsEl = document.getElementById('analyticsGrid');
+                if (!analyticsEl) return;
+                
+                analyticsEl.innerHTML = `
+                    <div class="analytics-item" style="display: flex !important; flex-direction: column; visibility: visible !important;">
+                        <div class="analytics-item-value" style="color: #6366f1 !important; font-size: 32px !important; font-weight: bold !important;">${totalDays}</div>
+                        <div class="analytics-item-label">Total Days</div>
+                    </div>
+                    <div class="analytics-item" style="display: flex !important; flex-direction: column; visibility: visible !important;">
+                        <div class="analytics-item-value" style="color: #6366f1 !important; font-size: 32px !important; font-weight: bold !important;">${winRate}%</div>
+                        <div class="analytics-item-label">Win Rate</div>
+                    </div>
+                    <div class="analytics-item" style="display: flex !important; flex-direction: column; visibility: visible !important;">
+                        <div class="analytics-item-value" style="color: #6366f1 !important; font-size: 32px !important; font-weight: bold !important;">${stats.losses}</div>
+                        <div class="analytics-item-label">Losses</div>
+                    </div>
+                    <div class="analytics-item" style="display: flex !important; flex-direction: column; visibility: visible !important;">
+                        <div class="analytics-item-value" style="color: #6366f1 !important; font-size: 32px !important; font-weight: bold !important;">${avgPerWeek}</div>
+                        <div class="analytics-item-label">Avg/Week</div>
+                    </div>
+                    <div class="analytics-item" style="display: flex !important; flex-direction: column; visibility: visible !important;">
+                        <div class="analytics-item-value" style="color: #fb923c !important; font-size: 32px !important; font-weight: bold !important;">${holidayCount}</div>
+                        <div class="analytics-item-label">Holidays</div>
+                    </div>
+                `;
+            }
+
+            renderAchievements() {
+                const stats = this.calculateStats();
+                const perfectWeekCount = this.countPerfectWeeks();
+                const achievements = [
+                    { icon: '🔥', label: 'Current Streak', unlocked: stats.currentStreak > 0, extra: stats.currentStreak },
+                    { icon: '⭐', label: '7-Day Streak', unlocked: stats.bestStreak >= 7 },
+                    { icon: '✨', label: '14-Day Streak', unlocked: stats.bestStreak >= 14 },
+                    { icon: '👑', label: '30-Day Streak', unlocked: stats.bestStreak >= 30 },
+                    { icon: '🚀', label: '60-Day Streak', unlocked: stats.bestStreak >= 60 },
+                    { icon: '🏆', label: '100 Wins', unlocked: stats.wins >= 100 },
+                    { icon: '💎', label: '250 Wins', unlocked: stats.wins >= 250 },
+                    { icon: '👼', label: 'Perfect Week', unlocked: perfectWeekCount > 0, extra: perfectWeekCount },
+                    { icon: '🎖️', label: 'Highest Streak', unlocked: stats.bestStreak > 0, extra: stats.bestStreak },
+                    { icon: '💯', label: '50% Win Rate', unlocked: this.getWinRate() >= 50 },
+                    { icon: '🌟', label: '75% Win Rate', unlocked: this.getWinRate() >= 75 }
+                ];
+
+                const container = document.getElementById('achievementsContainer');
+                container.innerHTML = '';
+                
+                achievements.forEach(achievement => {
+                    const badge = document.createElement('div');
+                    badge.className = `achievement-badge ${achievement.unlocked ? '' : 'locked'}`;
+                    const extraText = achievement.extra ? ` (${achievement.extra})` : '';
+                    badge.innerHTML = `
+                        <span class="achievement-icon">${achievement.icon}</span>
+                        <span>${achievement.label}${extraText}</span>
+                    `;
+                    container.appendChild(badge);
+                });
+            }
+
+            countPerfectWeeks() {
+                let count = 0;
+                const dates = Object.keys(this.tracker).sort();
+                
+                if (dates.length === 0) return 0;
+
+                let weekStart = new Date(dates[0]);
+                weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+
+                let currentDate = new Date(weekStart);
+                
+                while (currentDate <= new Date()) {
+                    let weekEnd = new Date(currentDate);
+                    weekEnd.setDate(weekEnd.getDate() + 6);
+                    
+                    let isPerfect = true;
+                    for (let d = new Date(currentDate); d <= weekEnd; d.setDate(d.getDate() + 1)) {
+                        const iso = d.toISOString().split('T')[0];
+                        if (!this.tracker[iso] || this.tracker[iso].result !== 'W') {
+                            isPerfect = false;
+                            break;
+                        }
+                    }
+                    
+                    if (isPerfect) count++;
+                    currentDate.setDate(currentDate.getDate() + 7);
+                }
+                
+                return count;
+            }
+
+            renderMonthlySummary() {
+                const monthlyStats = {};
+                
+                for (let iso in this.tracker) {
+                    const month = iso.substring(0, 7);
+                    if (!monthlyStats[month]) {
+                        monthlyStats[month] = { wins: 0, losses: 0, holidays: 0 };
+                    }
+                    
+                    if (this.tracker[iso].isHoliday) {
+                        monthlyStats[month].holidays++;
+                    } else if (this.tracker[iso].result === 'W') {
+                        monthlyStats[month].wins++;
+                    } else if (this.tracker[iso].result === 'L') {
+                        monthlyStats[month].losses++;
+                    }
+                }
+
+                const monthlyEl = document.getElementById('monthlyGrid');
+                monthlyEl.innerHTML = '';
+
+                Object.keys(monthlyStats).sort().reverse().slice(0, 12).forEach(month => {
+                    const stats = monthlyStats[month];
+                    const [year, monthNum] = month.split('-');
+                    const date = new Date(year, parseInt(monthNum) - 1);
+                    const monthName = date.toLocaleDateString('en-US', { month: 'short' });
+                    
+                    const item = document.createElement('div');
+                    item.className = 'month-item';
+                    item.innerHTML = `
+                        <div class="month-name">${monthName} '${year.slice(2)}</div>
+                        <div class="month-stats">
+                            <span class="month-win">${stats.wins}W</span>
+                            <span style="color: var(--text-tertiary);">/</span>
+                            <span class="month-loss">${stats.losses}L</span>
+                            ${stats.holidays > 0 ? `<span style="color: var(--text-tertiary);">/</span><span style="color: var(--accent-holiday);">${stats.holidays}H</span>` : ''}
+                        </div>
+                    `;
+                    monthlyEl.appendChild(item);
+                });
+            }
+
+            getWinRate() {
+                const stats = this.calculateStats();
+                // Exclude holidays from total days count
+                const totalDays = Object.keys(this.tracker).filter(iso => {
+                    const day = this.tracker[iso];
+                    return day.result !== null && !day.isHoliday;
+                }).length;
+                return totalDays > 0 ? Math.round((stats.wins / totalDays) * 100) : 0;
+            }
+
+            // ============ USER INTERACTIONS ============
+
+            loadDay(iso) {
+                const date = new Date(iso + 'T00:00:00');
+                this.currentDate = date;
+
+                // Load day data for the selected date
+                this.loadDayData();
+
+                // Switch to today's view if loading today
+                if (iso === this.getTodayISO()) {
+                    // Stay in today view
+                } else {
+                    // Show message about viewing past day
+                    this.showStatus(`Viewing ${this.formatDateDisplay(date)}`, 'info');
+                }
+            }
+
+            autosaveDay() {
+                const iso = this.getTodayISO();
+                const todayData = this.getTodayData();
+                const result = this.calculateResult(todayData.tasks);
+
+                if (!result) {
+                    this.showStatus('Cannot determine result - check tasks', 'error');
+                    return;
+                }
+
+                this.tracker[iso] = {
+                    result: result,
+                    tasks: todayData.tasks
+                };
+                this.saveTracker();
+                this.showStatus(`Day saved as ${result === 'W' ? '✓ WIN' : '✗ LOSS'}`, 'success');
+                this.render();
+            }
+
+            toggleHoliday() {
+                const iso = this.getTodayISO();
+                if (!this.tracker[iso]) {
+                    this.tracker[iso] = {};
+                }
+                
+                this.tracker[iso].isHoliday = !this.tracker[iso].isHoliday;
+                
+                // When marking as holiday, clear the result (it's a plain day)
+                if (this.tracker[iso].isHoliday) {
+                    this.tracker[iso].result = null;
+                }
+                
+                this.saveTracker();
+                
+                const action = this.tracker[iso].isHoliday ? 'marked as 🏖️ Holiday' : 'unmarked as holiday';
+                this.showStatus(`Day ${action}`, 'success');
+                this.render();
+            }
+
+            updateHolidayButton() {
+                const iso = this.getTodayISO();
+                const holidayBtn = document.getElementById('holidayBtn');
+                if (!holidayBtn) return;
+
+                const isHoliday = this.tracker[iso] && this.tracker[iso].isHoliday;
+                if (isHoliday) {
+                    holidayBtn.classList.add('active');
+                } else {
+                    holidayBtn.classList.remove('active');
+                }
+            }
+
+            updateDayStatus() {
+                const todayData = this.getTodayData();
+                const result = this.calculateResult(todayData.tasks);
+                const dayStatusEl = document.getElementById('dayStatus');
+                const savedIndicator = document.getElementById('savedIndicator');
+                const todayISO = this.getTodayISO();
+                const isSaved = this.tracker[todayISO] && this.tracker[todayISO].result !== null;
+                const isHoliday = this.tracker[todayISO] && this.tracker[todayISO].isHoliday;
+
+                dayStatusEl.className = 'day-status';
+                
+                if (isHoliday) {
+                    dayStatusEl.classList.add('holiday');
+                    dayStatusEl.innerHTML = `
+                        <div class="day-status-label">
+                            <span class="day-status-icon">🏖️</span>
+                            <span class="day-status-text">Holiday / Break Day</span>
+                        </div>
+                        ${isSaved ? '<span class="day-status-saved">✓ Marked</span>' : ''}
+                    `;
+                } else if (result === 'W') {
+                    dayStatusEl.classList.add('win');
+                    dayStatusEl.innerHTML = `
+                        <div class="day-status-label">
+                            <span class="day-status-icon">✓</span>
+                            <span class="day-status-text">This will be a WIN</span>
+                        </div>
+                        ${isSaved ? '<span class="day-status-saved">✓ Saved</span>' : ''}
+                    `;
+                } else if (result === 'L') {
+                    dayStatusEl.classList.add('loss');
+                    dayStatusEl.innerHTML = `
+                        <div class="day-status-label">
+                            <span class="day-status-icon">✗</span>
+                            <span class="day-status-text">This will be a LOSS</span>
+                        </div>
+                        ${isSaved ? '<span class="day-status-saved">✓ Saved</span>' : ''}
+                    `;
+                } else {
+                    dayStatusEl.innerHTML = `
+                        <div class="day-status-label">
+                            <span class="day-status-icon">—</span>
+                            <span class="day-status-text">Not yet evaluated</span>
+                        </div>
+                        ${isSaved ? '<span class="day-status-saved">✓ Saved</span>' : ''}
+                    `;
+                }
+            }
+
+            saveDay(result) {
+                const iso = this.getTodayISO();
+                this.setDayData(iso, result);
+                this.render();
+            }
+
+            updateTasks(newTasksStr) {
+                const lines = newTasksStr.split('\n')
+                    .map(line => line.trim())
+                    .filter(line => line.length > 0);
+
+                if (lines.length === 0) {
+                    this.showStatus('Tasks cannot be empty', 'error');
+                    return false;
+                }
+
+                this.taskList = lines;
+                this.saveTaskList();
+
+                // Re-initialize today's tasks with new list
+                const todayISO = this.getTodayISO();
+                if (this.tracker[todayISO]) {
+                    this.tracker[todayISO].tasks = Array(this.taskList.length).fill(true);
+                    this.saveTracker();
+                }
+
+                this.showStatus('Tasks updated successfully', 'success');
+                return true;
+            }
+
+            showStatus(message, type) {
+                const statusEl = document.getElementById('statusMessage');
+                statusEl.textContent = message;
+                statusEl.className = 'status-message status-' + type;
+                statusEl.style.display = 'block';
+                setTimeout(() => {
+                    statusEl.style.display = 'none';
+                }, 2000);
+            }
+
+            // ============ COLLAPSIBLE SECTIONS ============
+
+            setupCollapsibles() {
+                const toggles = document.querySelectorAll('.collapse-toggle');
+                const collapseStates = this.loadCollapseStates();
+
+                toggles.forEach(toggle => {
+                    const cardName = toggle.getAttribute('data-card');
+                    const cardContent = toggle.closest('.card-header').nextElementSibling;
+                    
+                    // Restore saved state
+                    const isCollapsed = collapseStates[cardName] || false;
+                    
+                    if (isCollapsed) {
+                        cardContent.classList.add('collapsed');
+                        toggle.textContent = '+';
+                    } else {
+                        cardContent.classList.remove('collapsed');
+                        toggle.textContent = '−';
+                    }
+
+                    // Add click listener
+                    toggle.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        this.toggleCollapse(toggle, cardContent, cardName);
+                    });
+                });
+            }
+
+            toggleCollapse(toggle, content, cardName) {
+                const isCollapsed = content.classList.contains('collapsed');
+
+                if (isCollapsed) {
+                    content.classList.remove('collapsed');
+                    toggle.textContent = '−';
+                } else {
+                    content.classList.add('collapsed');
+                    toggle.textContent = '+';
+                }
+
+                this.saveCollapseState(cardName, !isCollapsed);
+            }
+
+            saveCollapseState(cardName, isCollapsed) {
+                const states = this.loadCollapseStates();
+                states[cardName] = isCollapsed;
+                localStorage.setItem('collapseStates', JSON.stringify(states));
+            }
+
+            loadCollapseStates() {
+                const saved = localStorage.getItem('collapseStates');
+                return saved ? JSON.parse(saved) : {};
+            }
+
+            // ============ NEW FEATURES ============
+
+            setupNewFeatures() {
+                // Habit Intensity Stars
+                const starBtns = document.querySelectorAll('.star-btn');
+                starBtns.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const intensity = parseInt(btn.getAttribute('data-intensity'));
+                        this.setHabitIntensity(intensity);
+                    });
+                });
+
+                // Holiday Button
+                const holidayBtn = document.getElementById('holidayBtn');
+                if (holidayBtn) {
+                    holidayBtn.addEventListener('click', () => this.toggleHoliday());
+                }
+
+                // Share Stats Button
+                const shareBtn = document.getElementById('shareStatsBtn');
+                if (shareBtn) {
+                    shareBtn.addEventListener('click', () => this.shareStats());
+                }
+
+                // Load all data
+                this.loadDayData();
+                this.renderWeeklyProgress();
+            }
+
+            setHabitIntensity(intensity) {
+                const today = new Date().toISOString().split('T')[0];
+                if (!this.tracker[today]) this.tracker[today] = {};
+                this.tracker[today].intensity = intensity;
+                this.saveTracker();
+
+                // Update star display
+                document.querySelectorAll('.star-btn').forEach((btn, idx) => {
+                    if (idx < intensity) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                });
+            }
+
+            loadDayData() {
+                const today = this.formatISO(this.currentDate);
+                const dayData = this.tracker[today] || {};
+
+                // Load intensity
+                if (dayData.intensity) {
+                    document.querySelectorAll('.star-btn').forEach((btn, idx) => {
+                        if (idx < dayData.intensity) {
+                            btn.classList.add('active');
+                        }
+                    });
+                }
+
+                // Load notes
+                const notesEl = document.getElementById('dailyNotes');
+                if (notesEl && dayData.notes) {
+                    notesEl.value = dayData.notes;
+                }
+
+                // Load adjustments
+                const adjustEl = document.getElementById('taskAdjustments');
+                if (adjustEl && dayData.adjustments) {
+                    adjustEl.value = dayData.adjustments;
+                }
+
+                // Load weekly goal
+                const weekGoalEl = document.getElementById('weeklyGoal');
+                if (weekGoalEl) {
+                    const weekStart = new Date(this.currentDate);
+                    weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+                    const weekKey = this.formatISO(weekStart);
+                    weekGoalEl.value = this.getWeeklyGoal(weekKey);
+                }
+
+                // Auto-save on blur
+                if (notesEl) notesEl.addEventListener('blur', () => this.saveDayNotes());
+                if (adjustEl) adjustEl.addEventListener('blur', () => this.saveDayAdjustments());
+                if (weekGoalEl) weekGoalEl.addEventListener('blur', () => this.saveWeeklyGoal());
+            }
+
+            saveDayNotes() {
+                const today = this.formatISO(this.currentDate);
+                const notes = document.getElementById('dailyNotes').value;
+                if (!this.tracker[today]) this.tracker[today] = {};
+                this.tracker[today].notes = notes;
+                this.saveTracker();
+            }
+
+            saveDayAdjustments() {
+                const today = this.formatISO(this.currentDate);
+                const adjustments = document.getElementById('taskAdjustments').value;
+                if (!this.tracker[today]) this.tracker[today] = {};
+                this.tracker[today].adjustments = adjustments;
+                this.saveTracker();
+            }
+
+            saveWeeklyGoal() {
+                const weekStart = new Date(this.currentDate);
+                weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+                const weekKey = this.formatISO(weekStart);
+                const goal = parseInt(document.getElementById('weeklyGoal').value) || 0;
+                
+                let weeklyGoals = JSON.parse(localStorage.getItem('weeklyGoals') || '{}');
+                weeklyGoals[weekKey] = goal;
+                localStorage.setItem('weeklyGoals', JSON.stringify(weeklyGoals));
+                
+                this.renderWeeklyProgress();
+            }
+
+            getWeeklyGoal(weekKey) {
+                const weeklyGoals = JSON.parse(localStorage.getItem('weeklyGoals') || '{}');
+                return weeklyGoals[weekKey] || '';
+            }
+
+            renderWeeklyProgress() {
+                // Use current selected date for the week calculation
+                const selectedDate = new Date(this.currentDate);
+                const weekStart = new Date(selectedDate);
+                weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+                const weekEnd = new Date(weekStart);
+                weekEnd.setDate(weekEnd.getDate() + 6);
+
+                const progressContainer = document.getElementById('weeklyProgress');
+                if (!progressContainer) return;
+                progressContainer.innerHTML = '';
+
+                const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                let wins = 0;
+                
+                for (let d = new Date(weekStart); d <= weekEnd; d.setDate(d.getDate() + 1)) {
+                    const iso = this.formatISO(d);
+                    const dayName = dayNames[d.getDay()];
+                    
+                    const dayEl = document.createElement('div');
+                    dayEl.className = 'weekly-progress-day';
+                    dayEl.title = iso; // Show full date on hover
+
+                    if (this.tracker[iso]?.result === 'W') {
+                        dayEl.classList.add('win');
+                        dayEl.textContent = dayName;
+                        wins++;
+                    } else if (this.tracker[iso]?.result === 'L') {
+                        dayEl.classList.add('loss');
+                        dayEl.textContent = dayName;
+                    } else {
+                        dayEl.classList.add('empty');
+                        dayEl.textContent = dayName;
+                    }
+
+                    progressContainer.appendChild(dayEl);
+                }
+
+                const goal = this.getWeeklyGoal(this.formatISO(weekStart));
+                if (goal) {
+                    const goalText = document.createElement('div');
+                    goalText.style.gridColumn = '1 / -1';
+                    goalText.style.marginTop = '8px';
+                    goalText.style.fontSize = '12px';
+                    goalText.style.color = 'var(--text-tertiary)';
+                    goalText.style.textAlign = 'center';
+                    goalText.textContent = `Goal: ${wins}/${goal}`;
+                    progressContainer.appendChild(goalText);
+                }
+            }
+
+            calculateStreaks() {
+                // Streaks count consecutive WIN days, holidays are completely ignored (don't break or count)
+                const allDates = Object.keys(this.tracker).sort();
+                if (allDates.length === 0) return { currentStreak: 0, bestStreak: 0 };
+
+                const today = this.formatISO(new Date());
+                let bestStreak = 0;
+                let currentStreak = 0;
+                let tempStreak = 0;
+                let lastWinDate = null;
+
+                for (let iso of allDates) {
+                    const day = this.tracker[iso];
+                    
+                    // Skip holidays completely - they don't affect streaks at all
+                    if (day.isHoliday) continue;
+                    
+                    // Only count wins for streaks
+                    if (day.result === 'W') {
+                        if (!lastWinDate) {
+                            tempStreak = 1;
+                        } else {
+                            // Check if consecutive (ignoring holidays in between)
+                            const curr = new Date(iso);
+                            const last = new Date(lastWinDate);
+                            let expectedDate = new Date(last);
+                            expectedDate.setDate(expectedDate.getDate() + 1);
+                            
+                            // Count forward from last win, skipping holidays
+                            let isConsecutive = false;
+                            while (expectedDate <= curr) {
+                                const expectedIso = this.formatISO(expectedDate);
+                                if (expectedIso === iso) {
+                                    isConsecutive = true;
+                                    break;
+                                }
+                                // Skip if it's a holiday, otherwise break streak
+                                if (this.tracker[expectedIso] && !this.tracker[expectedIso].isHoliday) {
+                                    break;
+                                }
+                                expectedDate.setDate(expectedDate.getDate() + 1);
+                            }
+                            
+                            if (isConsecutive) {
+                                tempStreak++;
+                            } else {
+                                bestStreak = Math.max(bestStreak, tempStreak);
+                                tempStreak = 1;
+                            }
+                        }
+                        lastWinDate = iso;
+                    } else if (day.result === 'L') {
+                        // Loss breaks the streak
+                        bestStreak = Math.max(bestStreak, tempStreak);
+                        tempStreak = 0;
+                        lastWinDate = null;
+                    }
+                }
+
+                bestStreak = Math.max(bestStreak, tempStreak);
+                
+                // Current streak is the temp streak if it extends to today (allowing holidays)
+                if (lastWinDate) {
+                    const lastWin = new Date(lastWinDate);
+                    const todayDate = new Date(today);
+                    
+                    // Check if streak extends to today (ignoring holidays)
+                    let checkDate = new Date(lastWin);
+                    let streakContinues = true;
+                    
+                    while (checkDate < todayDate) {
+                        checkDate.setDate(checkDate.getDate() + 1);
+                        const checkIso = this.formatISO(checkDate);
+                        
+                        if (this.tracker[checkIso]) {
+                            if (this.tracker[checkIso].isHoliday) {
+                                continue; // Skip holidays
+                            } else if (this.tracker[checkIso].result === 'L') {
+                                streakContinues = false;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    if (streakContinues) {
+                        currentStreak = tempStreak;
+                    }
+                }
+
+                return { currentStreak, bestStreak };
+            }
+
+            shareStats() {
+                const selectedMonth = document.getElementById('shareMonthSelector')?.value || 'all';
+                let filteredData = this.tracker;
+                let monthName = 'All Time';
+
+                // Filter by month if not "all"
+                if (selectedMonth !== 'all') {
+                    filteredData = {};
+                    for (let iso in this.tracker) {
+                        if (iso.startsWith(selectedMonth)) {
+                            filteredData[iso] = this.tracker[iso];
+                        }
+                    }
+                    const [year, month] = selectedMonth.split('-');
+                    const date = new Date(year, parseInt(month) - 1);
+                    monthName = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                }
+
+                // Calculate stats for filtered data
+                let wins = 0;
+                let losses = 0;
+                for (let iso in filteredData) {
+                    if (filteredData[iso].isHoliday) continue;
+                    if (filteredData[iso].result === 'W') wins++;
+                    else if (filteredData[iso].result === 'L') losses++;
+                }
+                const totalDays = wins + losses;
+                const winRate = totalDays > 0 ? Math.round((wins / totalDays) * 100) : 0;
+
+                const shareText = `📊 Discipline Tracker - ${monthName}
+━━━━━━━━━━━━━━━━━━━━━━━
+✅ Total Wins: ${wins}
+❌ Total Losses: ${losses}
+📈 Win Rate: ${winRate}%
+📅 Days Tracked: ${totalDays}
+━━━━━━━━━━━━━━━━━━━━━━━
+Keep grinding! 💪`;
+
+                const preview = document.getElementById('shareStatsPreview');
+                if (preview) {
+                    preview.textContent = shareText;
+                    preview.style.display = 'block';
+                }
+
+                // Copy to clipboard
+                navigator.clipboard.writeText(shareText).then(() => {
+                    this.showStatus('Stats copied to clipboard! 📋', 'success');
+                    if (preview) {
+                        setTimeout(() => {
+                            preview.style.display = 'none';
+                        }, 3000);
+                    }
+                });
+            }
+
+            // ============ EVENT LISTENERS ============
+
+            setupEventListeners() {
+                // Setup collapsible sections
+                this.setupCollapsibles();
+
+                // Setup new features
+                this.setupNewFeatures();
+
+                const themeBtn = document.getElementById('themeToggle');
+                if (themeBtn) {
+                    themeBtn.addEventListener('click', () => this.toggleTheme());
+                    this.updateThemeButton();
+                }
+
+                const thresholdSlider = document.getElementById('thresholdSlider');
+                const thresholdDisplay = document.getElementById('thresholdDisplay');
+                if (thresholdSlider && thresholdDisplay) {
+                    thresholdSlider.value = this.threshold;
+                    thresholdDisplay.textContent = this.threshold + '%';
+                    
+                    thresholdSlider.addEventListener('input', (e) => {
+                        thresholdDisplay.textContent = e.target.value + '%';
+                    });
+                    
+                    thresholdSlider.addEventListener('change', (e) => {
+                        this.threshold = parseInt(e.target.value);
+                        this.saveThreshold(this.threshold);
+                        thresholdDisplay.textContent = this.threshold + '%';
+                        this.render();
+                    });
+                }
+
+                document.getElementById('exportDataBtn').addEventListener('click', () => this.exportData());
+                document.getElementById('importDataBtn').addEventListener('click', () => this.openImportModal());
+                document.getElementById('confirmImportBtn').addEventListener('click', () => this.importData());
+                document.getElementById('cancelImportBtn').addEventListener('click', () => this.closeImportModal());
+                document.getElementById('closeImportModal').addEventListener('click', () => this.closeImportModal());
+
+                document.getElementById('importModal').addEventListener('click', (e) => {
+                    if (e.target.id === 'importModal') this.closeImportModal();
+                });
+
+                document.getElementById('saveDayBtn').addEventListener('click', () => this.autosaveDay());
+                document.getElementById('editTasksBtn').addEventListener('click', () => this.openEditTasksModal());
+
+                document.getElementById('saveTasksBtn').addEventListener('click', () => this.handleSaveTasksClick());
+                document.getElementById('cancelEditBtn').addEventListener('click', () => this.closeEditTasksModal());
+                document.getElementById('closeEditModal').addEventListener('click', () => this.closeEditTasksModal());
+
+                document.getElementById('prevMonthBtn').addEventListener('click', () => {
+                    this.calendarDate.setMonth(this.calendarDate.getMonth() - 1);
+                    this.renderCalendar();
+                });
+
+                document.getElementById('nextMonthBtn').addEventListener('click', () => {
+                    this.calendarDate.setMonth(this.calendarDate.getMonth() + 1);
+                    this.renderCalendar();
+                });
+
+                // Calendar filters
+                const filterBtns = document.querySelectorAll('.filter-btn');
+                filterBtns.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        filterBtns.forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        this.calendarFilter = btn.getAttribute('data-filter');
+                        this.renderCalendar();
+                    });
+                });
+
+                // Close modal on outside click
+                document.getElementById('editTasksModal').addEventListener('click', (e) => {
+                    if (e.target.id === 'editTasksModal') {
+                        this.closeEditTasksModal();
+                    }
+                });
+            }
+
+            openEditTasksModal() {
+                const modal = document.getElementById('editTasksModal');
+                const textarea = document.getElementById('tasksTextarea');
+                textarea.value = this.taskList.join('\n');
+                modal.style.display = 'block';
+                textarea.focus();
+            }
+
+            closeEditTasksModal() {
+                document.getElementById('editTasksModal').style.display = 'none';
+            }
+
+            handleSaveTasksClick() {
+                const textarea = document.getElementById('tasksTextarea');
+                if (this.updateTasks(textarea.value)) {
+                    this.closeEditTasksModal();
+                    this.render();
+                }
+            }
+
+            updateThresholdDisplay() {
+                const display = document.getElementById('thresholdDisplay');
+                const slider = document.getElementById('thresholdSlider');
+                if (!display || !slider) return;
+
+                const val = parseInt(slider.value || this.threshold || 80);
+                display.textContent = val + '%';
+            }
+
+            populateMonthSelector() {
+                const selector = document.getElementById('shareMonthSelector');
+                if (!selector) return;
+
+                // Get all unique months from tracker data
+                const months = new Set();
+                for (let iso in this.tracker) {
+                    const month = iso.substring(0, 7); // YYYY-MM
+                    months.add(month);
+                }
+
+                // Sort months in descending order
+                const sortedMonths = Array.from(months).sort().reverse();
+
+                // Clear existing options except "All Time"
+                selector.innerHTML = '<option value="all">All Time</option>';
+
+                // Add month options
+                sortedMonths.forEach(month => {
+                    const [year, monthNum] = month.split('-');
+                    const date = new Date(year, parseInt(monthNum) - 1);
+                    const monthName = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                    const option = document.createElement('option');
+                    option.value = month;
+                    option.textContent = monthName;
+                    selector.appendChild(option);
+                });
+            }
+
+            exportData() {
+                const data = {
+                    tracker: this.tracker,
+                    taskList: this.taskList,
+                    threshold: this.threshold,
+                    exportDate: new Date().toISOString()
+                };
+                const json = JSON.stringify(data, null, 2);
+                
+                // Create downloadable blob
+                const blob = new Blob([json], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `discipline-backup-${new Date().toISOString().split('T')[0]}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+                
+                this.showStatus('Data exported successfully', 'success');
+            }
+
+            openImportModal() {
+                document.getElementById('importModal').style.display = 'block';
+            }
+
+            closeImportModal() {
+                document.getElementById('importModal').style.display = 'none';
+                document.getElementById('importTextarea').value = '';
+            }
+
+            importData() {
+                const textarea = document.getElementById('importTextarea');
+                try {
+                    const data = JSON.parse(textarea.value);
+                    if (!data.tracker || !data.taskList) {
+                        throw new Error('Invalid data format');
+                    }
+                    
+                    this.tracker = data.tracker;
+                    this.taskList = data.taskList;
+                    this.threshold = data.threshold || 80;
+                    
+                    this.saveTracker();
+                    this.saveTaskList();
+                    this.saveThreshold(this.threshold);
+                    
+                    this.closeImportModal();
+                    this.render();
+                    this.showStatus('Data imported successfully', 'success');
+                } catch (e) {
+                    this.showStatus('Import failed: ' + e.message, 'error');
+                }
+            }
+        }
+
+        // ============ INITIALIZE APP ============
+        let app;
+        document.addEventListener('DOMContentLoaded', () => {
+            app = new DisciplineTracker();
+        });
+    </script>
+</body>
+</html>
