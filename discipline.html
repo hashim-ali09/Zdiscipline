@@ -1173,6 +1173,11 @@
             color: #86efac;
         }
 
+        .status-error {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(220, 38, 38, 0.1));
+            color: #fca5a5;
+        }
+
         .achievement-badge {
             display: inline-flex;
             flex-direction: column;
@@ -1406,6 +1411,160 @@
             gap: 8px;
             align-items: center;
         }
+
+        /* ========== TASK MODE TOGGLE ========== */
+        .task-mode-toggle {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            background: var(--bg-accent);
+            padding: 6px;
+            border-radius: 10px;
+            border: 1px solid var(--border-dark);
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 10px 16px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+        }
+
+        .mode-btn.active {
+            background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-blue) 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .mode-btn:hover:not(.active) {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--accent-primary);
+        }
+
+        /* ========== QUADRANT LAYOUT ========== */
+        .quadrant-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .quadrant {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(168, 85, 247, 0.04) 100%);
+            border: 1px solid var(--border-dark);
+            border-radius: 12px;
+            padding: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .quadrant:hover {
+            border-color: var(--accent-primary);
+            box-shadow: 0 4px 16px rgba(99, 102, 241, 0.15);
+        }
+
+        .quadrant-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-dark);
+        }
+
+        .quadrant-icon {
+            font-size: 18px;
+        }
+
+        .quadrant-title {
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--accent-focus);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .quadrant-time {
+            font-size: 10px;
+            color: var(--text-tertiary);
+            margin-left: auto;
+        }
+
+        .quadrant-tasks {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .quadrant-task-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-dark);
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .quadrant-task-item:hover {
+            background: linear-gradient(135deg, var(--bg-accent) 0%, rgba(251, 191, 36, 0.05) 100%);
+            border-color: var(--accent-gold);
+            transform: translateX(4px);
+        }
+
+        .quadrant-empty {
+            padding: 20px;
+            text-align: center;
+            color: var(--text-tertiary);
+            font-size: 12px;
+            font-style: italic;
+        }
+
+        /* ========== HOLIDAY REASON ========== */
+        .holiday-reason-input {
+            width: 100%;
+            padding: 12px;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border: 1px solid var(--border-dark);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 14px;
+            margin-top: 12px;
+        }
+
+        .holiday-reason-display {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(217, 119, 6, 0.08));
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 12px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .holiday-reason-label {
+            font-size: 11px;
+            color: var(--accent-holiday);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .quadrant-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1431,14 +1590,48 @@
                             <button class="collapse-toggle" data-card="todays-tasks">−</button>
                         </div>
                         <div class="card-content">
-                            <div class="day-status" id="dayStatus">
-                            <div class="day-status-label">
-                                <span class="day-status-icon">—</span>
-                                <span class="day-status-text">Not yet evaluated</span>
+                            <!-- List Mode Tasks -->
+                            <div id="linearTasksView" class="tasks-section"></div>
+
+                            <!-- Quadrant Mode Tasks -->
+                            <div id="quadrantTasksView" style="display: none;">
+                                <div class="quadrant-grid">
+                                    <div class="quadrant" data-quadrant="0">
+                                        <div class="quadrant-header">
+                                            <span class="quadrant-icon">🌙</span>
+                                            <span class="quadrant-title">Midnight</span>
+                                            <span class="quadrant-time">12 AM - 6 AM</span>
+                                        </div>
+                                        <div class="quadrant-tasks" id="quadrant-0"></div>
+                                    </div>
+                                    <div class="quadrant" data-quadrant="1">
+                                        <div class="quadrant-header">
+                                            <span class="quadrant-icon">🌅</span>
+                                            <span class="quadrant-title">Morning</span>
+                                            <span class="quadrant-time">6 AM - 12 PM</span>
+                                        </div>
+                                        <div class="quadrant-tasks" id="quadrant-1"></div>
+                                    </div>
+                                    <div class="quadrant" data-quadrant="2">
+                                        <div class="quadrant-header">
+                                            <span class="quadrant-icon">☀️</span>
+                                            <span class="quadrant-title">Afternoon</span>
+                                            <span class="quadrant-time">12 PM - 6 PM</span>
+                                        </div>
+                                        <div class="quadrant-tasks" id="quadrant-2"></div>
+                                    </div>
+                                    <div class="quadrant" data-quadrant="3">
+                                        <div class="quadrant-header">
+                                            <span class="quadrant-icon">🌆</span>
+                                            <span class="quadrant-title">Evening</span>
+                                            <span class="quadrant-time">6 PM - 12 AM</span>
+                                        </div>
+                                        <div class="quadrant-tasks" id="quadrant-3"></div>
+                                    </div>
+                                </div>
                             </div>
-                            <span class="day-status-saved" id="savedIndicator"></span>
-                        </div>
-                        <div class="tasks-section" id="tasksList"></div>
+
+                            <div id="dayStatusContainer"></div>
 
                         <!-- Habit Intensity Rating -->
                         <div class="habit-intensity">
@@ -1646,6 +1839,16 @@
                         <div class="card-content">
                             <div class="settings-grid">
                                 <div class="setting-item">
+                                    <div class="setting-label">Task View Mode</div>
+                                    <div class="setting-value">
+                                        <select id="taskModeSelector" style="flex: 1; padding: 10px; background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-dark); border-radius: 8px; font-size: 13px; cursor: pointer;">
+                                            <option value="list">📋 List View - Simple vertical list</option>
+                                            <option value="quadrant">⏰ Time Quadrants - Organize by time blocks</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="setting-item">
                                     <label class="setting-label">Optional Tasks Threshold</label>
                                     <div class="setting-value">
                                         <input type="range" id="thresholdSlider" min="50" max="100" step="5" value="80" oninput="document.getElementById('thresholdDisplay').textContent = this.value + '%'">
@@ -1675,11 +1878,51 @@
             <div class="task-format-help">
                 <strong>Format:</strong><br>
                 !Task name (mandatory)<br>
-                Task name (optional)
+                Task name (optional)<br><br>
+                <strong>For Time Quadrants Mode:</strong><br>
+                !Task name @Q1 (Q0=Midnight, Q1=Morning, Q2=Afternoon, Q3=Evening)<br>
+                Task name @Q2<br><br>
+                <em>Note: Change view mode in Settings</em>
             </div>
             <div class="button-group" style="margin-top: 16px;">
                 <button class="btn-primary" id="saveTasksBtn">Save Tasks</button>
                 <button class="btn-secondary" id="cancelEditBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Holiday Reason Modal -->
+    <div id="holidayReasonModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Holiday Reason</h2>
+                <button class="close-btn" id="closeHolidayModal">&times;</button>
+            </div>
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; margin-bottom: 8px; font-size: 13px; color: var(--text-secondary); font-weight: 600;">Why are you taking a holiday?</label>
+                <input type="text" id="holidayReasonInput" class="holiday-reason-input" placeholder="e.g., Family emergency, Sick day, Personal time..." />
+            </div>
+            <div class="button-group">
+                <button class="btn-primary" id="confirmHolidayBtn">Confirm Holiday</button>
+                <button class="btn-secondary" id="cancelHolidayBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Holiday Reason Modal -->
+    <div id="holidayReasonModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Holiday Reason</h2>
+                <button class="close-btn" id="closeHolidayModal">&times;</button>
+            </div>
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; margin-bottom: 8px; font-size: 13px; color: var(--text-secondary); font-weight: 600;">Why are you taking a holiday?</label>
+                <input type="text" id="holidayReasonInput" class="holiday-reason-input" placeholder="e.g., Family emergency, Sick day, Personal time..." />
+            </div>
+            <div class="button-group">
+                <button class="btn-primary" id="confirmHolidayBtn">Confirm Holiday</button>
+                <button class="btn-secondary" id="cancelHolidayBtn">Cancel</button>
             </div>
         </div>
     </div>
@@ -1714,6 +1957,7 @@
                 this.theme = this.loadTheme();
                 this.threshold = this.loadThreshold();
                 this.calendarFilter = 'all';
+                this.taskMode = this.loadTaskMode();
 
                 this.init();
                 this.applyTheme();
@@ -1726,11 +1970,11 @@
                 // Initialize default tasks if none exist
                 if (this.taskList.length === 0) {
                     this.taskList = [
-                        "!Pray 5 Namaz",
-                        "!Quran",
-                        "Box / Workout",
-                        "Book Reading",
-                        "Deep Work"
+                        "!Pray 5 Namaz | Q1",
+                        "!Quran | Q1",
+                        "Box / Workout | Q2",
+                        "Book Reading | Q2",
+                        "Deep Work | Q3"
                     ];
                     this.saveTaskList();
                 }
@@ -1745,6 +1989,45 @@
             saveThreshold(val) {
                 this.threshold = val;
                 localStorage.setItem('threshold', val.toString());
+            }
+
+            loadTaskMode() {
+                const mode = localStorage.getItem('taskMode');
+                // Migrate old 'linear' to 'list'
+                if (mode === 'linear') {
+                    localStorage.setItem('taskMode', 'list');
+                    return 'list';
+                }
+                return mode || 'list';
+            }
+
+            saveTaskMode() {
+                localStorage.setItem('taskMode', this.taskMode);
+            }
+
+            setTaskMode(mode) {
+                this.taskMode = mode;
+                this.saveTaskMode();
+                this.updateTaskModeUI();
+                this.renderTasks();
+            }
+
+            updateTaskModeUI() {
+                const linearView = document.getElementById('linearTasksView');
+                const quadrantView = document.getElementById('quadrantTasksView');
+                const selector = document.getElementById('taskModeSelector');
+
+                if (selector) {
+                    selector.value = this.taskMode;
+                }
+
+                if (this.taskMode === 'list') {
+                    linearView.style.display = 'flex';
+                    quadrantView.style.display = 'none';
+                } else {
+                    linearView.style.display = 'none';
+                    quadrantView.style.display = 'block';
+                }
             }
 
             // ============ DATA PERSISTENCE ============
@@ -1819,8 +2102,17 @@
 
             parseTask(taskStr) {
                 const mandatory = taskStr.startsWith('!');
-                const name = mandatory ? taskStr.slice(1).trim() : taskStr.trim();
-                return { name, mandatory };
+                let cleanStr = mandatory ? taskStr.slice(1).trim() : taskStr.trim();
+                
+                // Check for quadrant assignment using @Q notation (e.g., "Task name @Q1")
+                let quadrant = null;
+                const quadrantMatch = cleanStr.match(/@Q([0-3])\s*$/);
+                if (quadrantMatch) {
+                    quadrant = parseInt(quadrantMatch[1]);
+                    cleanStr = cleanStr.replace(/@Q[0-3]\s*$/, '').trim();
+                }
+                
+                return { name: cleanStr, mandatory, quadrant };
             }
 
             // ============ DAY DATA ============
@@ -1975,7 +2267,20 @@
 
             renderTasks() {
                 const todayData = this.getTodayData();
-                const tasksList = document.getElementById('tasksList');
+                this.updateTaskModeUI();
+
+                if (this.taskMode === 'list') {
+                    this.renderLinearTasks();
+                } else {
+                    this.renderQuadrantTasks();
+                }
+
+                this.updateDayStatus();
+            }
+
+            renderLinearTasks() {
+                const todayData = this.getTodayData();
+                const tasksList = document.getElementById('linearTasksView');
                 tasksList.innerHTML = '';
 
                 this.taskList.forEach((taskStr, idx) => {
@@ -2008,8 +2313,66 @@
                     taskItem.appendChild(label);
                     tasksList.appendChild(taskItem);
                 });
+            }
 
-                this.updateDayStatus();
+            renderQuadrantTasks() {
+                const todayData = this.getTodayData();
+                
+                // Clear all quadrants
+                for (let q = 0; q < 4; q++) {
+                    const quadrantEl = document.getElementById(`quadrant-${q}`);
+                    quadrantEl.innerHTML = '';
+                }
+
+                // Group tasks by quadrant
+                const quadrantTasks = { 0: [], 1: [], 2: [], 3: [] };
+                
+                this.taskList.forEach((taskStr, idx) => {
+                    const { name, mandatory, quadrant } = this.parseTask(taskStr);
+                    const q = quadrant !== null ? quadrant : 1; // Default to morning quadrant
+                    quadrantTasks[q].push({ name, mandatory, idx });
+                });
+
+                // Render tasks in each quadrant
+                for (let q = 0; q < 4; q++) {
+                    const quadrantEl = document.getElementById(`quadrant-${q}`);
+                    const tasks = quadrantTasks[q];
+
+                    if (tasks.length === 0) {
+                        quadrantEl.innerHTML = '<div class="quadrant-empty">No tasks scheduled</div>';
+                        continue;
+                    }
+
+                    tasks.forEach(({ name, mandatory, idx }) => {
+                        const isCompleted = todayData.tasks[idx];
+
+                        const taskItem = document.createElement('div');
+                        taskItem.className = 'quadrant-task-item';
+
+                        const checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.id = `task-${idx}`;
+                        checkbox.checked = isCompleted;
+                        checkbox.addEventListener('change', (e) => {
+                            todayData.tasks[idx] = e.target.checked;
+                            this.updateDayTasks(this.getTodayISO(), todayData.tasks);
+                            this.updateDayStatus();
+                        });
+
+                        const label = document.createElement('label');
+                        label.htmlFor = `task-${idx}`;
+                        label.innerHTML = `
+                            ${name}
+                            <span class="task-badge ${mandatory ? 'mand' : 'opt'}">
+                                ${mandatory ? 'MAND' : 'OPT'}
+                            </span>
+                        `;
+
+                        taskItem.appendChild(checkbox);
+                        taskItem.appendChild(label);
+                        quadrantEl.appendChild(taskItem);
+                    });
+                }
             }
 
             renderStats() {
@@ -2334,31 +2697,56 @@
             }
 
             toggleHoliday() {
-                const iso = this.getTodayISO();
-                if (!this.tracker[iso]) {
-                    this.tracker[iso] = {};
+                const todayData = this.getTodayData();
+                
+                if (todayData.result === 'H') {
+                    // Remove holiday
+                    delete todayData.result;
+                    delete todayData.holidayReason;
+                    this.saveTracker();
+                    this.render();
+                    this.showStatus('Holiday removed', 'success');
+                } else {
+                    // Show holiday reason modal
+                    this.openHolidayReasonModal();
                 }
+            }
+
+            openHolidayReasonModal() {
+                const modal = document.getElementById('holidayReasonModal');
+                const input = document.getElementById('holidayReasonInput');
+                input.value = '';
+                modal.style.display = 'block';
+                input.focus();
+            }
+
+            closeHolidayReasonModal() {
+                document.getElementById('holidayReasonModal').style.display = 'none';
+            }
+
+            confirmHoliday() {
+                const reason = document.getElementById('holidayReasonInput').value.trim();
                 
-                this.tracker[iso].isHoliday = !this.tracker[iso].isHoliday;
-                
-                // When marking as holiday, clear the result (it's a plain day)
-                if (this.tracker[iso].isHoliday) {
-                    this.tracker[iso].result = null;
+                if (!reason) {
+                    this.showStatus('Please provide a reason for the holiday', 'error');
+                    return;
                 }
-                
+
+                const todayData = this.getTodayData();
+                todayData.result = 'H';
+                todayData.holidayReason = reason;
                 this.saveTracker();
-                
-                const action = this.tracker[iso].isHoliday ? 'marked as 🏖️ Holiday' : 'unmarked as holiday';
-                this.showStatus(`Day ${action}`, 'success');
+                this.closeHolidayReasonModal();
                 this.render();
+                this.showStatus(`Holiday set: ${reason}`, 'success');
             }
 
             updateHolidayButton() {
-                const iso = this.getTodayISO();
+                const todayData = this.getTodayData();
                 const holidayBtn = document.getElementById('holidayBtn');
                 if (!holidayBtn) return;
 
-                const isHoliday = this.tracker[iso] && this.tracker[iso].isHoliday;
+                const isHoliday = todayData.result === 'H';
                 if (isHoliday) {
                     holidayBtn.classList.add('active');
                 } else {
@@ -2368,51 +2756,57 @@
 
             updateDayStatus() {
                 const todayData = this.getTodayData();
-                const result = this.calculateResult(todayData.tasks);
-                const dayStatusEl = document.getElementById('dayStatus');
-                const savedIndicator = document.getElementById('savedIndicator');
-                const todayISO = this.getTodayISO();
-                const isSaved = this.tracker[todayISO] && this.tracker[todayISO].result !== null;
-                const isHoliday = this.tracker[todayISO] && this.tracker[todayISO].isHoliday;
-
-                dayStatusEl.className = 'day-status';
+                const container = document.getElementById('dayStatusContainer');
                 
-                if (isHoliday) {
-                    dayStatusEl.classList.add('holiday');
-                    dayStatusEl.innerHTML = `
-                        <div class="day-status-label">
-                            <span class="day-status-icon">🏖️</span>
-                            <span class="day-status-text">Holiday / Break Day</span>
-                        </div>
-                        ${isSaved ? '<span class="day-status-saved">✓ Marked</span>' : ''}
-                    `;
-                } else if (result === 'W') {
-                    dayStatusEl.classList.add('win');
-                    dayStatusEl.innerHTML = `
-                        <div class="day-status-label">
-                            <span class="day-status-icon">✓</span>
-                            <span class="day-status-text">This will be a WIN</span>
-                        </div>
-                        ${isSaved ? '<span class="day-status-saved">✓ Saved</span>' : ''}
-                    `;
-                } else if (result === 'L') {
-                    dayStatusEl.classList.add('loss');
-                    dayStatusEl.innerHTML = `
-                        <div class="day-status-label">
-                            <span class="day-status-icon">✗</span>
-                            <span class="day-status-text">This will be a LOSS</span>
-                        </div>
-                        ${isSaved ? '<span class="day-status-saved">✓ Saved</span>' : ''}
-                    `;
-                } else {
-                    dayStatusEl.innerHTML = `
-                        <div class="day-status-label">
-                            <span class="day-status-icon">—</span>
-                            <span class="day-status-text">Not yet evaluated</span>
-                        </div>
-                        ${isSaved ? '<span class="day-status-saved">✓ Saved</span>' : ''}
-                    `;
+                if (!todayData.result) {
+                    container.innerHTML = '';
+                    return;
                 }
+
+                let statusHTML = '';
+                
+                if (todayData.result === 'W') {
+                    statusHTML = `
+                        <div class="day-status win">
+                            <div class="day-status-label">
+                                <span class="day-status-icon">✅</span>
+                                <span class="day-status-text">Day Saved as WIN</span>
+                            </div>
+                            <span class="day-status-saved">Saved</span>
+                        </div>
+                    `;
+                } else if (todayData.result === 'L') {
+                    statusHTML = `
+                        <div class="day-status loss">
+                            <div class="day-status-label">
+                                <span class="day-status-icon">❌</span>
+                                <span class="day-status-text">Day Saved as LOSS</span>
+                            </div>
+                            <span class="day-status-saved">Saved</span>
+                        </div>
+                    `;
+                } else if (todayData.result === 'H') {
+                    statusHTML = `
+                        <div class="day-status holiday">
+                            <div class="day-status-label">
+                                <span class="day-status-icon">🏖️</span>
+                                <span class="day-status-text">Holiday</span>
+                            </div>
+                            <span class="day-status-saved">Saved</span>
+                        </div>
+                    `;
+                    
+                    if (todayData.holidayReason) {
+                        statusHTML += `
+                            <div class="holiday-reason-display">
+                                <div class="holiday-reason-label">Reason</div>
+                                <div>${todayData.holidayReason}</div>
+                            </div>
+                        `;
+                    }
+                }
+
+                container.innerHTML = statusHTML;
             }
 
             saveDay(result) {
@@ -2876,6 +3270,35 @@ Keep grinding! 💪`;
                 document.getElementById('cancelEditBtn').addEventListener('click', () => this.closeEditTasksModal());
                 document.getElementById('closeEditModal').addEventListener('click', () => this.closeEditTasksModal());
 
+                // Task Mode Selector (in Settings)
+                const taskModeSelector = document.getElementById('taskModeSelector');
+                if (taskModeSelector) {
+                    taskModeSelector.value = this.taskMode;
+                    taskModeSelector.addEventListener('change', (e) => {
+                        this.setTaskMode(e.target.value);
+                        this.showStatus(`Switched to ${e.target.value === 'list' ? 'List View' : 'Time Quadrants'} mode`, 'success');
+                    });
+                }
+
+                // Holiday Reason Modal
+                document.getElementById('confirmHolidayBtn').addEventListener('click', () => {
+                    this.confirmHoliday();
+                });
+
+                document.getElementById('cancelHolidayBtn').addEventListener('click', () => {
+                    this.closeHolidayReasonModal();
+                });
+
+                document.getElementById('closeHolidayModal').addEventListener('click', () => {
+                    this.closeHolidayReasonModal();
+                });
+
+                document.getElementById('holidayReasonModal').addEventListener('click', (e) => {
+                    if (e.target.id === 'holidayReasonModal') {
+                        this.closeHolidayReasonModal();
+                    }
+                });
+
                 document.getElementById('prevMonthBtn').addEventListener('click', () => {
                     this.calendarDate.setMonth(this.calendarDate.getMonth() - 1);
                     this.renderCalendar();
@@ -2968,6 +3391,7 @@ Keep grinding! 💪`;
                     tracker: this.tracker,
                     taskList: this.taskList,
                     threshold: this.threshold,
+                    taskMode: this.taskMode, // 'list' or 'quadrant'
                     exportDate: new Date().toISOString()
                 };
                 const json = JSON.stringify(data, null, 2);
@@ -3004,10 +3428,14 @@ Keep grinding! 💪`;
                     this.tracker = data.tracker;
                     this.taskList = data.taskList;
                     this.threshold = data.threshold || 80;
+                    // Migrate old 'linear' to 'list'
+                    let mode = data.taskMode || 'list';
+                    this.taskMode = mode === 'linear' ? 'list' : mode;
                     
                     this.saveTracker();
                     this.saveTaskList();
                     this.saveThreshold(this.threshold);
+                    this.saveTaskMode();
                     
                     this.closeImportModal();
                     this.render();
